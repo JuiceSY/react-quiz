@@ -1,70 +1,103 @@
-# Getting Started with Create React App
+# The React Quiz ⚛️
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 📖 Description
+The React Quiz is an interactive, timed web application designed to test a user's knowledge of React.js. 
 
-## Available Scripts
+**Architectural Focus:** This project was primarily built to demonstrate advanced state management in React using the `useReducer` hook. Rather than managing a messy web of individual `useState` variables, the entire application's logic (fetching data, tracking points, progressing the index, managing the timer, and recording high scores) is centralized within a single, predictable reducer function.
 
-In the project directory, you can run:
+```
+javascript
+function reducer(state, action) {
+  switch (action.type) {
+    case "dataReceived":
+      return { ...state, questions: action.payLoad, status: "ready" };
+    case "dataFailed":
+      return { ...state, status: "error" };
+    case "start":
+      return { ...state, status: "active", secondsRemaining: state.questions.length * SECS_PER_QUESTION };
+    case "newAnswer":
+      const question = state.questions.at(state.index);
+      return {
+        ...state,
+        answer: action.payLoad,
+        points: action.payLoad === question.correctOption ? state.points + question.points : state.points,
+      };
+    case "nextQuestion":
+      return { ...state, answer: null, index: state.index + 1 };
+    case "finish":
+      return {
+        ...state,
+        status: "finished",
+        highscore: state.points > state.highscore ? state.points : state.highscore,
+      };
+    case "restart":
+      return { ...initialState, questions: state.questions, status: "ready", highscore: state.highscore };
+    case "tick":
+      return {
+        ...state,
+        secondsRemaining: state.secondsRemaining - 1,
+        status: state.secondsRemaining === 0 ? "finished" : state.status,
+      };
+    default:
+      throw new Error("Unknown Action");
+  }
+}
+```
 
-### `npm start`
+## 🚀 Features
+* **Global Timer:** A countdown timer automatically calculates total time based on the number of questions and finishes the quiz if it hits zero.
+* **Dynamic Progress Tracking:** A visual progress bar updates instantly alongside the user's current score and question index.
+* **Instant Visual Feedback:** Color-coded UI highlights the correct answer and the user's selected answer upon submission.
+* **Persistent High Scores:** The application retains the maximum score achieved across multiple playthroughs.
+* **Robust Error Handling:** Custom error states gracefully handle failed API or database fetches.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🛠️ Built With
+* React 
+* Advanced Hooks (`useReducer`, `useEffect`)
+* CSS Modules / Vanilla CSS
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 💻 Visual Walk-through
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<p align="center">
+<b>Start Screen:</b> <br/>
+The initial UI state welcoming the user and establishing the question count.<br/>
+<img src="assets/start_quiz.png" height="80%" width="80%" alt="Start Screen"/>
+<br />
+<br />
+<b>Active Gameplay:</b> <br/>
+The main interface displaying the active question, timer, and dynamic progress bar.<br/>
+<img src="assets/begin.png" height="80%" width="80%" alt="First Question"/>
+<br />
+<br />
+<b>Live Progression:</b> <br/>
+State updates continuously track the remaining time and cumulative score as the user progresses.<br/>
+<img src="assets/time_score_progression.png" height="80%" width="80%" alt="Score Progression"/>
+<br />
+<br />
+<b>Answer Validation (Correct):</b> <br/>
+Dispatching a new answer triggers UI changes, confirming the right choice and updating points.<br/>
+<img src="assets/right_answer.png" height="80%" width="80%" alt="Correct Answer Feedback"/>
+<br />
+<br />
+<b>Answer Validation (Incorrect):</b> <br/>
+If the user guesses wrong, the UI identifies their mistake while revealing the correct solution.<br/>
+<img src="assets/wrong_answer.png" height="80%" width="80%" alt="Wrong Answer Feedback"/>
+<br />
+<br />
+<b>Quiz Completion:</b> <br/>
+The final state calculates the percentage score, displays the result, and logs the Highscore.<br/>
+<img src="assets/finish.png" height="80%" width="80%" alt="Finish Screen"/>
+<br />
+<br />
+<b>Highscore Retention:</b> <br/>
+Upon restarting, the global state resets the board but intelligently preserves the user's highest historical score.<br/>
+<img src="assets/top_score_kept.png" height="80%" width="80%" alt="Highscore Tracking"/>
+<br />
+<br />
+<b>Error Handling:</b> <br/>
+Graceful fallback UI if the application fails to fetch the question data.<br/>
+<img src="assets/error_fetch.png" height="80%" width="80%" alt="Error Handling"/>
+</p>
+Graceful fallback UI if the application fails to fetch the question data.<br/>
+<img src="assets/error_fetch.png" height="80%" width="80%" alt="Error Handling"/>
+</p>
