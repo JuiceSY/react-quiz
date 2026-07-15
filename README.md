@@ -98,6 +98,3 @@ Upon restarting, the global state resets the board but intelligently preserves t
 Graceful fallback UI if the application fails to fetch the question data.<br/>
 <img src="assets/error_fetch.png" height="80%" width="80%" alt="Error Handling"/>
 </p>
-Graceful fallback UI if the application fails to fetch the question data.<br/>
-<img src="assets/error_fetch.png" height="80%" width="80%" alt="Error Handling"/>
-</p>
